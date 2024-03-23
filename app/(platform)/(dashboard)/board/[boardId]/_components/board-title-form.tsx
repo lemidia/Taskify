@@ -5,6 +5,7 @@ import { FormErrors } from "@/components/form/form-errors";
 import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useAction } from "@/hooks/use-action";
 import { Board } from "@prisma/client";
 import { FormEvent, useEffect, useRef, useState } from "react";
@@ -55,16 +56,12 @@ export const BoardTitleForm = ({ board }: BoardTitleFormProps) => {
 
   if (isEditing) {
     return (
-      <form
-        ref={formRef}
-        className="flex items-center gap-x-2"
-        action={onSubmit}
-      >
+      <form ref={formRef} action={onSubmit}>
         <FormInput
           defaultValue={optimisticTitle}
           ref={inputRef}
           id="title"
-          className="text-lg font-bold px-2 bg-black/20 focus-visible:outline-none focus-visible:ring-transparent border-none w-[150px]"
+          className="font-bold h-8 bg-black/20 focus-visible:outline-none focus-visible:ring-transparent w-[150px] border-none"
           onBlur={() => {
             formRef.current?.requestSubmit();
           }}

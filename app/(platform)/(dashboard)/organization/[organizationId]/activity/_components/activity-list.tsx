@@ -30,15 +30,6 @@ export const ActivityList = async () => {
       {auditLogs.map((log) => (
         <ActivityItem key={log.id} log={log} />
       ))}
-      {auditLogs.map((log) => (
-        <ActivityItem key={log.id} log={log} />
-      ))}
-      {auditLogs.map((log) => (
-        <ActivityItem key={log.id} log={log} />
-      ))}
-      {auditLogs.map((log) => (
-        <ActivityItem key={log.id} log={log} />
-      ))}
     </ol>
   );
 };

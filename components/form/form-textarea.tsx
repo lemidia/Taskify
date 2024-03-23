@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyboardEventHandler, forwardRef } from "react";
+import { HTMLAttributes, KeyboardEventHandler, forwardRef } from "react";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ type TextareaProps = {
   onKeyDown?: KeyboardEventHandler<HTMLTextAreaElement>;
   defaultValue?: string;
   placeholder?: string;
-};
+} & React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
 export const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
@@ -35,6 +35,7 @@ export const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       onKeyDown,
       defaultValue,
       placeholder,
+      ...props
     },
     ref
   ) => {
@@ -49,6 +50,7 @@ export const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             </Label>
           )}
           <Textarea
+            {...props}
             onKeyDown={onKeyDown}
             onBlur={onBlur}
             onClick={onClick}

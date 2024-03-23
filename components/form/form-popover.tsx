@@ -76,6 +76,7 @@ export const FormPopover = ({
               type="text"
               required
               errors={fieldErrors}
+              className="h-7 px-2"
             />
           </div>
           <FormSubmit className="w-full">Create</FormSubmit>

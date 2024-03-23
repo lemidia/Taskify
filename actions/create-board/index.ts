@@ -8,6 +8,7 @@ import { createSafeAction } from "@/lib/create-safe-action";
 import { CreateBoard } from "./schema";
 import { ACTION, ENTITY_TYPE } from "@prisma/client";
 import { createAuditLog } from "@/lib/create-audit-log";
+import { MAX_FREE_BOARDS } from "@/constans/board-limit";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   try {
@@ -19,6 +20,37 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       };
     }
 
+    // Retrieve this org's limitation count of boards
+    // If there is no table of that one, create that one
+    let orgLimit = await db.orgLimit.findUnique({
+      where: {
+        orgId,
+      },
+    });
+
+    if (!orgLimit) {
+      orgLimit = await db.orgLimit.create({
+        data: {
+          orgId,
+          count: MAX_FREE_BOARDS,
+        },
+      });
+    }
+
+    // Check if the number of boards of the org exceeds limit
+    const boardsOfThisOrg = await db.board.findMany({
+      where: {
+        orgId,
+      },
+    });
+
+    if (boardsOfThisOrg.length >= orgLimit.count) {
+      return {
+        error: "No more boards can't be created - Reason : Reaching the limit",
+      };
+    }
+
+    // Destructure data from the client
     const { title, image } = data;
 
     const [imageId, imageThumbUrl, imageFullUrl, imageUserName, imageLinkHTML] =

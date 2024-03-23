@@ -5,6 +5,7 @@ import { FormSubmit } from "@/components/form/form-submit";
 import { FormTextarea } from "@/components/form/form-textarea";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 import { useAction } from "@/hooks/use-action";
 import { CardWithList } from "@/types";
 import { AlignLeft } from "lucide-react";
@@ -88,13 +89,13 @@ export const Description = ({ data }: DescriptionProps) => {
             </Button>
           </form>
         ) : (
-          <div
-            role="button"
+          <FormTextarea
+            id="display"
+            readOnly
+            value={description || "Add a more detailed description..."}
             onClick={enableEditing}
-            className="min-h-[78px] bg-neutral-200 text-sm font-medium py-3 px-3.5 rounded-md"
-          >
-            {description || "Add a more detailed description..."}
-          </div>
+            className="min-h-[100px] bg-neutral-100 font-medium py-3 px-3.5 rounded-md cursor-pointer shadow-none"
+          />
         )}
       </div>
     </div>

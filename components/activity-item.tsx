@@ -8,7 +8,7 @@ type ActivityItemProps = {
 };
 export const ActivityItem = ({ log }: ActivityItemProps) => {
   return (
-    <li className="flex items-center gap-x-2">
+    <li className="flex items-start gap-x-2">
       <Avatar className="h-8 w-8">
         <AvatarImage src={log.userImage} />
       </Avatar>
