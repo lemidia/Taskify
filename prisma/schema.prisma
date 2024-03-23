@@ -17,6 +17,7 @@ model Board {
   imageFullUrl  String @db.Text
   imageUserName String @db.Text
   imageLinkHTML String @db.Text
+  blurHash      String @db.Text
 
   lists List[]
 

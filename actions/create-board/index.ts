@@ -9,6 +9,7 @@ import { CreateBoard } from "./schema";
 import { ACTION, ENTITY_TYPE } from "@prisma/client";
 import { createAuditLog } from "@/lib/create-audit-log";
 import { MAX_FREE_BOARDS } from "@/constans/board-limit";
+import { blurHashToDataURL } from "@/lib/blurhashDataURL";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   try {
@@ -53,8 +54,16 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     // Destructure data from the client
     const { title, image } = data;
 
-    const [imageId, imageThumbUrl, imageFullUrl, imageUserName, imageLinkHTML] =
-      image.split("|");
+    const [
+      imageId,
+      imageThumbUrl,
+      imageFullUrl,
+      imageUserName,
+      imageLinkHTML,
+      blurHash,
+    ] = image.split("|");
+
+    const blurHashDateUrl = blurHashToDataURL(blurHash);
 
     const board = await db.board.create({
       data: {
@@ -65,6 +74,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         imageFullUrl,
         imageUserName,
         imageLinkHTML,
+        blurHash: blurHashDateUrl || "data:image/png;base64,",
       },
     });
 
@@ -78,6 +88,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     revalidatePath(`/organization/${orgId}`);
     return { data: board };
   } catch (error) {
+    console.log(error);
     console.log("Error from Server Action - create-board.ts");
     return {
       error: "Failed to create",
