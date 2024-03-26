@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import { useFormStatus } from "react-dom";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { defaultImages } from "@/constans/images";
+import { defaultImages } from "@/constants/images";
 import Link from "next/link";
 import { FormErrors } from "./form-errors";
 
@@ -40,7 +40,6 @@ export const FormPicker = ({ id, errors }: FormPickerProps) => {
           setImages(defaultImages);
         }
       } catch (error) {
-        console.log(error);
         setImages(defaultImages);
       } finally {
         setIsLoading(false);

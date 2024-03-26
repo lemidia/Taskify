@@ -15,6 +15,7 @@ import { X } from "lucide-react";
 import { toast } from "sonner";
 import { useRef } from "react";
 import { FormPicker } from "./form-picker";
+import { useProModal } from "@/hooks/use-pro-modal";
 
 export const FormPopover = ({
   children,
@@ -27,16 +28,20 @@ export const FormPopover = ({
   align?: "start" | "center" | "end";
   sideOffset?: number;
 }) => {
+  const { onOpen } = useProModal();
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const { execute, fieldErrors, setFieldErrors, error, data, isLoading } =
     useAction(createBoard, {
       onSuccess: (data) => {
-        toast.success("Board created!");
+        toast.success(`Board "${data.title}" has been created`);
         closeRef.current?.click();
       },
-      onError: (error) => {
-        toast.error(error || "Fail to create");
+      onError: (error: string) => {
+        toast.error(error);
+        if (error.includes("limit")) {
+          onOpen();
+        }
       },
     });
 

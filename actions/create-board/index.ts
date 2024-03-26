@@ -8,8 +8,9 @@ import { createSafeAction } from "@/lib/create-safe-action";
 import { CreateBoard } from "./schema";
 import { ACTION, ENTITY_TYPE } from "@prisma/client";
 import { createAuditLog } from "@/lib/create-audit-log";
-import { MAX_FREE_BOARDS } from "@/constans/board-limit";
+import { MAX_FREE_BOARDS } from "@/constants/board-limit";
 import { blurHashToDataURL } from "@/lib/blurhashDataURL";
+import { checkSubscription } from "@/lib/subscription";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   try {
@@ -21,33 +22,17 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       };
     }
 
-    // Retrieve this org's limitation count of boards
-    // If there is no table of that one, create that one
-    let orgLimit = await db.orgLimit.findUnique({
-      where: {
-        orgId,
-      },
-    });
-
-    if (!orgLimit) {
-      orgLimit = await db.orgLimit.create({
-        data: {
-          orgId,
-          count: MAX_FREE_BOARDS,
-        },
-      });
-    }
-
     // Check if the number of boards of the org exceeds limit
-    const boardsOfThisOrg = await db.board.findMany({
+    const countBoardsOfThisOrg = await db.board.count({
       where: {
         orgId,
       },
     });
 
-    if (boardsOfThisOrg.length >= orgLimit.count) {
+    // Meaning, this org exceeded the limit count of creating boards or not a member of Pro membership
+    if (countBoardsOfThisOrg >= MAX_FREE_BOARDS && !checkSubscription) {
       return {
-        error: "No more boards can't be created - Reason : Reaching the limit",
+        error: "No more boards can't be created - Reaching the limit count",
       };
     }
 
@@ -76,6 +61,11 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         imageLinkHTML,
         blurHash: blurHashDateUrl || "data:image/png;base64,",
       },
+      select: {
+        id: true,
+        title: true,
+        orgId: true,
+      },
     });
 
     await createAuditLog({
@@ -87,8 +77,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
     revalidatePath(`/organization/${orgId}`);
     return { data: board };
-  } catch (error) {
-    console.log(error);
+  } catch (error: unknown) {
     console.log("Error from Server Action - create-board.ts");
     return {
       error: "Failed to create",

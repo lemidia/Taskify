@@ -4,13 +4,15 @@ import { FormPopover } from "@/components/form/form-popover";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MAX_FREE_BOARDS } from "@/constans/board-limit";
+import { MAX_FREE_BOARDS } from "@/constants/board-limit";
+import { checkSubscription } from "@/lib/subscription";
 
 type BoardListProps = {
   organizationId: string;
+  isPro: boolean;
 };
 
-export const BoardList = async ({ organizationId }: BoardListProps) => {
+export const BoardList = async ({ organizationId, isPro }: BoardListProps) => {
   const boards = await db.board.findMany({
     where: {
       orgId: organizationId,
@@ -18,15 +20,18 @@ export const BoardList = async ({ organizationId }: BoardListProps) => {
     orderBy: {
       createdAt: "asc",
     },
-  });
-
-  const orgLimit = await db.orgLimit.findUnique({
-    where: {
-      orgId: organizationId,
+    select: {
+      id: true,
+      orgId: true,
+      title: true,
+      imageId: true,
+      imageThumbUrl: true,
     },
   });
 
-  const boardCountLimit = orgLimit ? orgLimit.count : MAX_FREE_BOARDS;
+  const remainingMessage = isPro
+    ? "Unlimited"
+    : MAX_FREE_BOARDS - (boards.length >= 5 ? 5 : boards.length) + " remaining";
 
   return (
     <div className="space-y-4">
@@ -51,13 +56,11 @@ export const BoardList = async ({ organizationId }: BoardListProps) => {
             role="button"
             className="relative aspect-video bg-muted rounded-sm flex flex-col gap-y-1 items-center justify-center hover:opacity-75 transition"
           >
-            <p className="text-md font-semibold">Create new board</p>
-            <span className="text-sm">
-              {boardCountLimit - boards.length} remaining
-            </span>
+            <p className="text-sm font-semibold">Create new board</p>
+            <span className="text-sm">{remainingMessage}</span>
             <Hint
               sideOffset={15}
-              description={`Free Workspaces can have up to 5 open boards. For unlimited boards upgrade this workspace. `}
+              description={`Free Workspaces can have up to 5 open boards. For unlimited boards, upgrade this workspace. `}
             >
               <HelpCircle className="absolute bottom-2 right-2 h-4  w-4" />
             </Hint>

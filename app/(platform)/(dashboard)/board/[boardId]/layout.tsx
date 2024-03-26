@@ -13,6 +13,9 @@ export const generateMetadata = async ({
     where: {
       id: boardId,
     },
+    select: {
+      title: true,
+    },
   });
 
   return {

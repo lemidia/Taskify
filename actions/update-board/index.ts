@@ -29,6 +29,11 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       data: {
         title,
       },
+      select: {
+        id: true,
+        orgId: true,
+        title: true,
+      },
     });
 
     await createAuditLog({
