@@ -30,7 +30,10 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     });
 
     // Meaning, this org exceeded the limit count of creating boards or not a member of Pro membership
-    if (countBoardsOfThisOrg >= MAX_FREE_BOARDS && !checkSubscription) {
+    if (
+      countBoardsOfThisOrg >= MAX_FREE_BOARDS &&
+      !(await checkSubscription())
+    ) {
       return {
         error: "No more boards can't be created - Reaching the limit count",
       };
